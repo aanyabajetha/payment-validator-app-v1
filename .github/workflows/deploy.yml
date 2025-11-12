@@ -12,16 +12,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '11'
 
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -32,7 +32,7 @@ jobs:
         run: mvn clean package -s settings.xml -B
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mule-app
           path: target/*.jar
@@ -44,15 +44,14 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: mule-app
 
       - name: Verify artifact presence
         run: |
           echo "Verifying build artifact..."
-          ls -l target || echo "No target folder found"
-          ls -l
+          ls -l || echo "Artifact not found"
 
       - name: Optional Local Deploy or Static Analysis
         run: echo "Performing optional checks or validations here."
@@ -65,6 +64,7 @@ jobs:
     steps:
       - name: Trigger deployment workflow in main repo
         run: |
+          echo "Triggering central workflow in maven-deployment-workflow repo..."
           curl -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.PAT }}" \
